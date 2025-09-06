@@ -152,16 +152,16 @@ public class GroupAndMemberExceptionAdvice {
             .body(ApiResponse.error(ResponseCode.BAD_REQUEST, ex.getMessage()));
     }
 
-    @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<ApiResponse<String>> memberNotFoundExHandler(MemberNotFoundException ex) {
-        return ResponseEntity.status(GroupAndMemberErrorCode.MEMBER_NOT_FOUND.status())
-            .body(ApiResponse.error(GroupAndMemberErrorCode.MEMBER_NOT_FOUND, GroupAndMemberErrorCode.MEMBER_NOT_FOUND.message()));
-    }
+    //@ExceptionHandler(MemberNotFoundException.class)
+    //public ResponseEntity<ApiResponse<String>> memberNotFoundExHandler(MemberNotFoundException ex) {
+    //    return ResponseEntity.status(GroupAndMemberErrorCode.MEMBER_NOT_FOUND.status())
+    //        .body(ApiResponse.error(GroupAndMemberErrorCode.MEMBER_NOT_FOUND, GroupAndMemberErrorCode.MEMBER_NOT_FOUND.message()));
+    //}
 
     // 400
     @ExceptionHandler(InvalidFavoriteRequestException.class)
     public ResponseEntity<ApiResponse<String>> invalidFavoriteRequestExHandler(
-        FavoriteNotFoundException ex) {
+        InvalidFavoriteRequestException ex) {
         return ResponseEntity.status(ex.getCode().status())
             .body(ApiResponse.error(ex.getCode()));
     }
