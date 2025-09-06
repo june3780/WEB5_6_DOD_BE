@@ -31,7 +31,7 @@ import com.grepp.spring.infra.error.exceptions.group.NotGroupLeaderException;
 import com.grepp.spring.infra.error.exceptions.group.NotGroupUserException;
 import com.grepp.spring.infra.error.exceptions.group.ScheduleAlreadyInGroupException;
 import com.grepp.spring.infra.error.exceptions.group.ScheduleNotFoundException;
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -239,7 +239,7 @@ public class GroupQueryService {
         Group group = event.getGroup();
         // 일정 일회성 조회 - 409 SCHEDULE_ALREADY_IN_GROUP
         if (group.getIsGrouped()) {
-            throw new ScheduleAlreadyInGroupException(GroupErrorCode.SCHEDULE_ALREADY_IN_GROUP);
+            throw new ScheduleAlreadyInGroupException(GroupAndMemberErrorCode.SCHEDULE_ALREADY_IN_GROUP);
         }
 
         // 로직 시작
@@ -287,13 +287,13 @@ public class GroupQueryService {
             !authentication.isAuthenticated() ||
             "anonymousUser".equals(authentication.getPrincipal())) {
 
-            throw new GroupAuthenticationException(GroupErrorCode.AUTHENTICATION_REQUIRED);
+            throw new GroupAuthenticationException(GroupAndMemberErrorCode.AUTHENTICATION_REQUIRED);
         }
         Optional<Member> memberOptional = memberRepository.findById(authentication.getName());
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
-        throw new GroupAuthenticationException(GroupErrorCode.AUTHENTICATION_REQUIRED);
+        throw new GroupAuthenticationException(GroupAndMemberErrorCode.AUTHENTICATION_REQUIRED);
     }
 
 
@@ -301,7 +301,7 @@ public class GroupQueryService {
     private Group extractGroup(Long groupId) {
         Optional<Group> groupOptional = groupQueryRepository.findById(groupId);
         if (groupOptional.isEmpty()) {
-            throw new GroupNotFoundException(GroupErrorCode.GROUP_NOT_FOUND);
+            throw new GroupNotFoundException(GroupAndMemberErrorCode.GROUP_NOT_FOUND);
         }
         return groupOptional.get();
     }
@@ -312,7 +312,7 @@ public class GroupQueryService {
         Optional<Schedule> scheduleOptional = scheduleQueryRepository.findById(
             scheduleId);
         if (scheduleOptional.isEmpty()) {
-            throw new ScheduleNotFoundException(GroupErrorCode.SCHEDULE_NOT_FOUND);
+            throw new ScheduleNotFoundException(GroupAndMemberErrorCode.SCHEDULE_NOT_FOUND);
         }
         return scheduleOptional.get();
     }
@@ -323,7 +323,7 @@ public class GroupQueryService {
         Optional<GroupMember> groupMemberOptional = groupMemberQueryRepository.findByGroupIdAndMemberId(
             groupId, id);
         if (groupMemberOptional.isEmpty()) {
-            throw new NotGroupUserException(GroupErrorCode.NOT_GROUP_MEMBER);
+            throw new NotGroupUserException(GroupAndMemberErrorCode.NOT_GROUP_MEMBER);
         }
         return groupMemberOptional.get();
     }
@@ -332,7 +332,7 @@ public class GroupQueryService {
     // 그룹멤버 리더 권한 조회 - 403 NOT_GROUP_LEADER 예외 처리
     private void checkRoleGroupLeader(GroupMember groupMember) {
         if (!groupMember.getRole().equals(GroupRole.GROUP_LEADER)) {
-            throw new NotGroupLeaderException(GroupErrorCode.NOT_GROUP_LEADER);
+            throw new NotGroupLeaderException(GroupAndMemberErrorCode.NOT_GROUP_LEADER);
         }
     }
 

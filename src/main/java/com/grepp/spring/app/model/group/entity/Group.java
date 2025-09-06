@@ -5,7 +5,7 @@ import com.grepp.spring.app.controller.api.group.payload.request.ModifyGroupInfo
 import com.grepp.spring.app.model.event.entity.Event;
 import com.grepp.spring.infra.entity.BaseEntity;
 import com.grepp.spring.infra.error.exceptions.group.ScheduleAlreadyInGroupException;
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -82,7 +82,7 @@ public class Group extends BaseEntity {
 
     public void isNotInGroupOrThrow() {
         if (this.isGrouped) {
-            throw new ScheduleAlreadyInGroupException(GroupErrorCode.SCHEDULE_ALREADY_IN_GROUP);
+            throw new ScheduleAlreadyInGroupException(GroupAndMemberErrorCode.SCHEDULE_ALREADY_IN_GROUP);
         }
 
     }

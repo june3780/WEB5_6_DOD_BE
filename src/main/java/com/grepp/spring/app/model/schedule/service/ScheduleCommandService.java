@@ -20,6 +20,7 @@ import com.grepp.spring.infra.error.exceptions.group.UserNotFoundException;
 import com.grepp.spring.infra.error.exceptions.schedule.EventNotActivatedException;
 import com.grepp.spring.infra.error.exceptions.schedule.LocationNotFoundException;
 import com.grepp.spring.infra.error.exceptions.schedule.VoteAlreadyProgressException;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.response.GroupErrorCode;
 import com.grepp.spring.infra.response.ScheduleErrorCode;
 import com.grepp.spring.infra.utils.RandomPicker;
@@ -89,7 +90,7 @@ public class ScheduleCommandService {
 
     private Member memberValid(String memberId) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new UserNotFoundException(GroupErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserNotFoundException(GroupAndMemberErrorCode.USER_NOT_FOUND));
         return member;
     }
 

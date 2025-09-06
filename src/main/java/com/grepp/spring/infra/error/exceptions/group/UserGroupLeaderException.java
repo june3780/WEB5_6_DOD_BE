@@ -1,25 +1,17 @@
 package com.grepp.spring.infra.error.exceptions.group;
 
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
 public class UserGroupLeaderException extends RuntimeException {
 
-    private final GroupErrorCode code;
+    private final GroupAndMemberErrorCode code;
 
-    public UserGroupLeaderException(GroupErrorCode code) {
+    public UserGroupLeaderException(GroupAndMemberErrorCode code) {
         this.code = code;
-    }
-
-    public UserGroupLeaderException(GroupErrorCode code, Exception e) {
-        this.code = code;
-        log.error(e.getMessage(), e);
-    }
-
-    public GroupErrorCode code() {
-        return code;
     }
 
 }
-

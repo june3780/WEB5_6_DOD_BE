@@ -29,6 +29,7 @@ import com.grepp.spring.infra.error.exceptions.schedule.NotScheduleMemberExcepti
 import com.grepp.spring.infra.error.exceptions.schedule.ScheduleMemberNotFoundException;
 import com.grepp.spring.infra.error.exceptions.schedule.WorkSpaceNotFoundException;
 import com.grepp.spring.infra.response.EventErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.response.GroupErrorCode;
 import com.grepp.spring.infra.response.ScheduleErrorCode;
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class ScheduleQueryService {
     public Schedule findScheduleById(Long scheduleId) {
         return scheduleQueryRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleNotFoundException(
-                GroupErrorCode.SCHEDULE_NOT_FOUND));
+                GroupAndMemberErrorCode.SCHEDULE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

@@ -23,6 +23,7 @@ import com.grepp.spring.app.model.schedule.entity.Schedule;
 import com.grepp.spring.app.model.schedule.entity.ScheduleMember;
 import com.grepp.spring.app.model.schedule.repository.ScheduleCommandRepository;
 import com.grepp.spring.app.model.schedule.repository.ScheduleMemberCommandRepository;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.utils.RandomPicker;
 import com.grepp.spring.infra.error.exceptions.group.GroupAuthenticationException;
 import com.grepp.spring.infra.error.exceptions.group.GroupNotFoundException;
@@ -32,7 +33,6 @@ import com.grepp.spring.infra.error.exceptions.group.ScheduleNotFoundException;
 import com.grepp.spring.infra.error.exceptions.group.UserAlreadyInGroupException;
 import com.grepp.spring.infra.error.exceptions.group.UserNotFoundException;
 import com.grepp.spring.infra.error.exceptions.member.WithdrawNotAllowedException;
-import com.grepp.spring.infra.response.GroupErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -252,13 +252,13 @@ public class GroupCommandService {
             !authentication.isAuthenticated() ||
             "anonymousUser".equals(authentication.getPrincipal())) {
 
-            throw new GroupAuthenticationException(GroupErrorCode.AUTHENTICATION_REQUIRED);
+            throw new GroupAuthenticationException(GroupAndMemberErrorCode.AUTHENTICATION_REQUIRED);
         }
         Optional<Member> memberOptional = memberRepository.findById(authentication.getName());
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }
-        throw new GroupAuthenticationException(GroupErrorCode.AUTHENTICATION_REQUIRED);
+        throw new GroupAuthenticationException(GroupAndMemberErrorCode.AUTHENTICATION_REQUIRED);
     }
 
 
@@ -266,7 +266,7 @@ public class GroupCommandService {
     private Member findMemberOrThrow(String userId) {
         Optional<Member> memberOptional = memberRepository.findById(userId);
         if (memberOptional.isEmpty()) {
-            throw new UserNotFoundException(GroupErrorCode.USER_NOT_FOUND);
+            throw new UserNotFoundException(GroupAndMemberErrorCode.USER_NOT_FOUND);
         }
         return memberOptional.get();
     }
@@ -276,7 +276,7 @@ public class GroupCommandService {
     private Group findGroupOrThrow(Long groupId) {
         Optional<Group> groupOptional = groupCommandRepository.findById(groupId);
         if (groupOptional.isEmpty()) {
-            throw new GroupNotFoundException(GroupErrorCode.GROUP_NOT_FOUND);
+            throw new GroupNotFoundException(GroupAndMemberErrorCode.GROUP_NOT_FOUND);
         }
         return groupOptional.get();
     }
@@ -287,7 +287,7 @@ public class GroupCommandService {
         Optional<Schedule> scheduleOptional = scheduleCommandRepository.findById(
             scheduleId);
         if (scheduleOptional.isEmpty()) {
-            throw new ScheduleNotFoundException(GroupErrorCode.SCHEDULE_NOT_FOUND);
+            throw new ScheduleNotFoundException(GroupAndMemberErrorCode.SCHEDULE_NOT_FOUND);
         }
         return scheduleOptional.get();
     }
@@ -298,7 +298,7 @@ public class GroupCommandService {
         Optional<GroupMember> groupMemberOptional = groupMemberCommandRepository.findByGroupIdAndMemberId(
             groupId, id);
         if (groupMemberOptional.isEmpty()) {
-            throw new NotGroupUserException(GroupErrorCode.NOT_GROUP_MEMBER);
+            throw new NotGroupUserException(GroupAndMemberErrorCode.NOT_GROUP_MEMBER);
         }
         return groupMemberOptional.get();
     }
@@ -309,7 +309,7 @@ public class GroupCommandService {
         Optional<GroupMember> groupMemberOptional = groupMemberCommandRepository.findByGroupIdAndMemberId(
             groupId, id);
         if (groupMemberOptional.isPresent()) {
-            throw new UserAlreadyInGroupException(GroupErrorCode.USER_ALREADY_IN_GROUP);
+            throw new UserAlreadyInGroupException(GroupAndMemberErrorCode.USER_ALREADY_IN_GROUP);
         }
     }
 
@@ -323,7 +323,7 @@ public class GroupCommandService {
         if (groupMember.isGroupLeader()
             && groupLeaderNum == 1
             && groupMemberNum != 0) {
-            throw new OnlyOneGroupLeaderException(GroupErrorCode.ONE_GROUP_LEADER);
+            throw new OnlyOneGroupLeaderException(GroupAndMemberErrorCode.ONE_GROUP_LEADER);
         }
     }
 
