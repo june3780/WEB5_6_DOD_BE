@@ -4,7 +4,7 @@ import com.grepp.spring.app.controller.api.mainpage.payload.response.UpdateActiv
 import com.grepp.spring.app.model.mainpage.repository.MainPageScheduleMemberRepository;
 import com.grepp.spring.app.model.schedule.entity.ScheduleMember;
 import com.grepp.spring.infra.error.exceptions.mypage.ScheduleMemberIdNotFoundException;
-import com.grepp.spring.infra.response.MyPageErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,17 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MainPageScheduleMemberService {
 
-  private final MainPageScheduleMemberRepository mainPageScheduleMemberRepository;
+    private final MainPageScheduleMemberRepository mainPageScheduleMemberRepository;
 
-  @Transactional
-  public UpdateActivationResponse updateActivation(Long scheduleMemberId) {
+    @Transactional
+    public UpdateActivationResponse updateActivation(Long scheduleMemberId) {
 
-    ScheduleMember sm = mainPageScheduleMemberRepository.findById(scheduleMemberId)
-        .orElseThrow(() -> new ScheduleMemberIdNotFoundException(MyPageErrorCode.SCHEDULE_MEMBER_NOT_FOUND_EXCEPTION));
+        ScheduleMember sm = mainPageScheduleMemberRepository.findById(scheduleMemberId)
+            .orElseThrow(() -> new ScheduleMemberIdNotFoundException(
+                GroupAndMemberErrorCode.SCHEDULE_MEMBER_NOT_FOUND_EXCEPTION));
 
-    sm.activation();
+        sm.activation();
 
-    return UpdateActivationResponse.from(sm);
-  }
+        return UpdateActivationResponse.from(sm);
+    }
 
 }

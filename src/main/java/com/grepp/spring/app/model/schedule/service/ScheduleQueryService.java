@@ -30,7 +30,6 @@ import com.grepp.spring.infra.error.exceptions.schedule.ScheduleMemberNotFoundEx
 import com.grepp.spring.infra.error.exceptions.schedule.WorkSpaceNotFoundException;
 import com.grepp.spring.infra.response.EventErrorCode;
 import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
-import com.grepp.spring.infra.response.GroupErrorCode;
 import com.grepp.spring.infra.response.ScheduleErrorCode;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,10 +66,12 @@ public class ScheduleQueryService {
         }
 
         if (bool) {
-            List<Workspace> workspaces = workspaceQueryRepository.findAllByScheduleId(schedule.getId());
+            List<Workspace> workspaces = workspaceQueryRepository.findAllByScheduleId(
+                schedule.getId());
 
             MeetingType meetingType = eventRepository.findById(eventId).get().getMeetingType();
-            List<Long> voteLocationId = voteQueryRepository.findByScheduleIdAndMemberId(schedule.getId());
+            List<Long> voteLocationId = voteQueryRepository.findByScheduleIdAndMemberId(
+                schedule.getId());
 
             ShowScheduleDto dto = ShowScheduleDto.fromEntity(meetingType, eventId, schedule,
                 scheduleMembers, workspaces, voteLocationId);
@@ -84,7 +85,8 @@ public class ScheduleQueryService {
     @Transactional(readOnly = true)
     public ShowSuggestedLocationsResponse showSuggestedLocation(Long scheduleId) {
         List<MetroInfoDto> infoDto = getMetroInfoDtos(scheduleId);
-        int scheduleMemberNumber = scheduleMemberQueryRepository.findByScheduleId(scheduleId).size();
+        int scheduleMemberNumber = scheduleMemberQueryRepository.findByScheduleId(scheduleId)
+            .size();
         int departLocationCount = getDepartLocationCount(scheduleId);
         int voteCount = voteQueryRepository.findByScheduleId(scheduleId).size();
 
@@ -106,7 +108,8 @@ public class ScheduleQueryService {
     }
 
     private int getDepartLocationCount(Long scheduleId) {
-        List<ScheduleMember> scheduleMembers = scheduleMemberQueryRepository.findByScheduleId(scheduleId);
+        List<ScheduleMember> scheduleMembers = scheduleMemberQueryRepository.findByScheduleId(
+            scheduleId);
         int departLocationCount = 0;
         for (ScheduleMember scheduleMember : scheduleMembers) {
             if (scheduleMember.getLatitude() != null) {

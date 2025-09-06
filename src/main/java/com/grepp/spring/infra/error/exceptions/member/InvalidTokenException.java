@@ -1,7 +1,9 @@
 package com.grepp.spring.infra.error.exceptions.member;
 
 import com.grepp.spring.infra.response.ResponseCode;
+import lombok.Getter;
 
+@Getter
 public class InvalidTokenException extends RuntimeException {
     private final ResponseCode responseCode;
 
@@ -10,7 +12,4 @@ public class InvalidTokenException extends RuntimeException {
         this.responseCode = responseCode;
     }
 
-    public ResponseCode getResponseCode() {
-        return responseCode;
-    }
 }
