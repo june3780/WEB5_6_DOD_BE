@@ -5,7 +5,7 @@ import com.grepp.spring.infra.error.exceptions.member.InvalidNameException;
 import com.grepp.spring.infra.error.exceptions.member.WithdrawNotAllowedException;
 import com.grepp.spring.infra.error.exceptions.mypage.MemberNotFoundException;
 import com.grepp.spring.infra.response.ApiResponse;
-import com.grepp.spring.infra.response.MyPageErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.response.ResponseCode;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +34,8 @@ public class MemberExceptionAdvice {
 
     @ExceptionHandler(MemberNotFoundException.class)
     public ResponseEntity<ApiResponse<String>> memberNotFoundExHandler(MemberNotFoundException ex) {
-        return ResponseEntity.status(MyPageErrorCode.MEMBER_NOT_FOUND.status())
-            .body(ApiResponse.error(MyPageErrorCode.MEMBER_NOT_FOUND, MyPageErrorCode.MEMBER_NOT_FOUND.message()));
+        return ResponseEntity.status(GroupAndMemberErrorCode.MEMBER_NOT_FOUND.status())
+            .body(ApiResponse.error(GroupAndMemberErrorCode.MEMBER_NOT_FOUND, GroupAndMemberErrorCode.MEMBER_NOT_FOUND.message()));
     }
 
 }

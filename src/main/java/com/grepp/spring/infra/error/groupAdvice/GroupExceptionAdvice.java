@@ -13,9 +13,8 @@ import com.grepp.spring.infra.error.exceptions.group.ScheduleNotFoundException;
 import com.grepp.spring.infra.error.exceptions.group.UserAlreadyInGroupException;
 import com.grepp.spring.infra.error.exceptions.group.UserGroupLeaderException;
 import com.grepp.spring.infra.error.exceptions.group.UserNotFoundException;
-import com.grepp.spring.infra.error.exceptions.group.UserNotInGroupException;
 import com.grepp.spring.infra.response.ApiResponse;
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.response.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -35,7 +34,7 @@ public class GroupExceptionAdvice {
         GroupAuthenticationException ex) {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(ApiResponse.error(GroupErrorCode.AUTHENTICATION_REQUIRED));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.AUTHENTICATION_REQUIRED));
     }
 
 
@@ -45,7 +44,7 @@ public class GroupExceptionAdvice {
         NotGroupLeaderException ex) {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(GroupErrorCode.NOT_GROUP_LEADER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.NOT_GROUP_LEADER));
     }
 
     @ExceptionHandler(NotGroupUserException.class)
@@ -53,7 +52,7 @@ public class GroupExceptionAdvice {
         NotGroupUserException ex) {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(GroupErrorCode.NOT_GROUP_MEMBER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.NOT_GROUP_MEMBER));
     }
 
     @ExceptionHandler(NotScheduleLeaderException.class)
@@ -61,7 +60,7 @@ public class GroupExceptionAdvice {
         NotScheduleLeaderException ex) {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(GroupErrorCode.NOT_SCHEDULE_LEADER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.NOT_SCHEDULE_LEADER));
     }
 
     @ExceptionHandler(NotScheduleUserException.class)
@@ -69,7 +68,7 @@ public class GroupExceptionAdvice {
         NotScheduleUserException ex) {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(GroupErrorCode.NOT_SCHEDULE_MEMBER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.NOT_SCHEDULE_MEMBER));
     }
 
 
@@ -80,7 +79,7 @@ public class GroupExceptionAdvice {
         log.error("404예외");
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.GROUP_NOT_FOUND));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.GROUP_NOT_FOUND));
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -88,7 +87,7 @@ public class GroupExceptionAdvice {
         UserNotFoundException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.USER_NOT_FOUND));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.USER_NOT_FOUND));
     }
 
     @ExceptionHandler(ScheduleNotFoundException.class)
@@ -96,7 +95,7 @@ public class GroupExceptionAdvice {
         ScheduleNotFoundException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.SCHEDULE_NOT_FOUND));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.SCHEDULE_NOT_FOUND));
     }
 
 
@@ -106,7 +105,7 @@ public class GroupExceptionAdvice {
         UserAlreadyInGroupException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.USER_ALREADY_IN_GROUP));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.USER_ALREADY_IN_GROUP));
     }
 
     @ExceptionHandler(ScheduleAlreadyInGroupException.class)
@@ -114,7 +113,7 @@ public class GroupExceptionAdvice {
         ScheduleAlreadyInGroupException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.SCHEDULE_ALREADY_IN_GROUP));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.SCHEDULE_ALREADY_IN_GROUP));
     }
 
     @ExceptionHandler(OnlyOneGroupLeaderException.class)
@@ -122,7 +121,7 @@ public class GroupExceptionAdvice {
         OnlyOneGroupLeaderException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.ONE_GROUP_LEADER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.ONE_GROUP_LEADER));
     }
 
     @ExceptionHandler(UserGroupLeaderException.class)
@@ -130,6 +129,6 @@ public class GroupExceptionAdvice {
         UserGroupLeaderException ex) {
 
         return ResponseEntity.status(ResponseCode.NOT_FOUND.status())
-            .body(ApiResponse.error(GroupErrorCode.USER_GROUP_LEADER));
+            .body(ApiResponse.error(GroupAndMemberErrorCode.USER_GROUP_LEADER));
     }
 }
