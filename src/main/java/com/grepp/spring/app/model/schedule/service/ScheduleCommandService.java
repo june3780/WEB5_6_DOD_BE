@@ -3,7 +3,11 @@ package com.grepp.spring.app.model.schedule.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grepp.spring.app.controller.api.schedule.payload.request.*;
+import com.grepp.spring.app.controller.api.schedule.payload.request.AddWorkspaceRequest;
+import com.grepp.spring.app.controller.api.schedule.payload.request.CreateDepartLocationRequest;
+import com.grepp.spring.app.controller.api.schedule.payload.request.CreateSchedulesRequest;
+import com.grepp.spring.app.controller.api.schedule.payload.request.ModifySchedulesRequest;
+import com.grepp.spring.app.controller.api.schedule.payload.request.WriteSuggestedLocationRequest;
 import com.grepp.spring.app.controller.api.schedule.payload.response.CreateOnlineMeetingRoomResponse;
 import com.grepp.spring.app.controller.api.schedule.payload.response.CreateSchedulesResponse;
 import com.grepp.spring.app.model.event.entity.Event;
@@ -12,33 +16,67 @@ import com.grepp.spring.app.model.member.repository.MemberRepository;
 import com.grepp.spring.app.model.schedule.code.MeetingPlatform;
 import com.grepp.spring.app.model.schedule.code.ScheduleRole;
 import com.grepp.spring.app.model.schedule.code.VoteStatus;
-import com.grepp.spring.app.model.schedule.dto.*;
-import com.grepp.spring.app.model.schedule.entity.*;
-import com.grepp.spring.app.model.schedule.repository.*;
+import com.grepp.spring.app.model.schedule.dto.AddWorkspaceDto;
+import com.grepp.spring.app.model.schedule.dto.CreateDepartLocationDto;
+import com.grepp.spring.app.model.schedule.dto.CreateOnlineMeetingRoomDto;
+import com.grepp.spring.app.model.schedule.dto.CreateScheduleDto;
+import com.grepp.spring.app.model.schedule.dto.CreateScheduleMembersDto;
+import com.grepp.spring.app.model.schedule.dto.DepartLocationMetroTransferDto;
+import com.grepp.spring.app.model.schedule.dto.ModifyScheduleDto;
+import com.grepp.spring.app.model.schedule.dto.ModifyWorkspaceDto;
+import com.grepp.spring.app.model.schedule.dto.SubwayStationDto;
+import com.grepp.spring.app.model.schedule.dto.VoteMiddleLocationDto;
+import com.grepp.spring.app.model.schedule.dto.WriteSuggestedLocationDto;
+import com.grepp.spring.app.model.schedule.dto.WriteSuggestedMetroTransferDto;
+import com.grepp.spring.app.model.schedule.dto.ZoomMeetingDto;
+import com.grepp.spring.app.model.schedule.entity.Line;
+import com.grepp.spring.app.model.schedule.entity.Location;
+import com.grepp.spring.app.model.schedule.entity.Metro;
+import com.grepp.spring.app.model.schedule.entity.MetroTransfer;
+import com.grepp.spring.app.model.schedule.entity.Schedule;
+import com.grepp.spring.app.model.schedule.entity.ScheduleMember;
+import com.grepp.spring.app.model.schedule.entity.Vote;
+import com.grepp.spring.app.model.schedule.entity.Workspace;
+import com.grepp.spring.app.model.schedule.repository.LineQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.LocationCommandRepository;
+import com.grepp.spring.app.model.schedule.repository.LocationQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.MetroQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.MetroTransferCommandRepository;
+import com.grepp.spring.app.model.schedule.repository.ScheduleCommandRepository;
+import com.grepp.spring.app.model.schedule.repository.ScheduleMemberQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.ScheduleMemberRepository;
+import com.grepp.spring.app.model.schedule.repository.ScheduleQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.VoteCommandRepository;
+import com.grepp.spring.app.model.schedule.repository.VoteQueryRepository;
+import com.grepp.spring.app.model.schedule.repository.WorkspaceCommandRepository;
+import com.grepp.spring.app.model.schedule.repository.WorkspaceQueryRepository;
 import com.grepp.spring.infra.error.exceptions.NotFoundException;
 import com.grepp.spring.infra.error.exceptions.group.UserNotFoundException;
 import com.grepp.spring.infra.error.exceptions.schedule.EventNotActivatedException;
 import com.grepp.spring.infra.error.exceptions.schedule.LocationNotFoundException;
 import com.grepp.spring.infra.error.exceptions.schedule.VoteAlreadyProgressException;
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import com.grepp.spring.infra.response.ScheduleErrorCode;
 import com.grepp.spring.infra.utils.RandomPicker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Slf4j
@@ -89,12 +127,13 @@ public class ScheduleCommandService {
 
     private Member memberValid(String memberId) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new UserNotFoundException(GroupErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserNotFoundException(GroupAndMemberErrorCode.USER_NOT_FOUND));
         return member;
     }
 
     private ScheduleMember getScheduleMember(Long scheduleId, String userId) {
-        ScheduleMember scheduleMember = scheduleMemberQueryRepository.findScheduleMember(userId, scheduleId);
+        ScheduleMember scheduleMember = scheduleMemberQueryRepository.findScheduleMember(userId,
+            scheduleId);
         return scheduleMember;
     }
 
@@ -133,7 +172,8 @@ public class ScheduleCommandService {
         return schedule;
     }
 
-    private void createScheduleMembers(CreateSchedulesRequest request, Schedule schedule, String userId) {
+    private void createScheduleMembers(CreateSchedulesRequest request, Schedule schedule,
+        String userId) {
         for (CreateScheduleMembersDto entry : request.getMembers()) {
             String memberId = String.valueOf(entry.getMemberId());
 
@@ -260,7 +300,8 @@ public class ScheduleCommandService {
     }
 
     @Transactional // Transactional 내에서 수정이 되어야 자동 변경 감지된다.
-    public void createDepartLocation(Long scheduleId, CreateDepartLocationRequest request, String userId) throws JsonProcessingException {
+    public void createDepartLocation(Long scheduleId, CreateDepartLocationRequest request,
+        String userId) throws JsonProcessingException {
 
         Optional<Schedule> schedule = getSchedule(scheduleId);
 
@@ -272,7 +313,8 @@ public class ScheduleCommandService {
         Optional<Metro> metro = getMetro(request.getDepartLocationName());
         setDepartLocation(request, metro, scheduleMember);
 
-        List<ScheduleMember> scheduleLocations = scheduleMemberQueryRepository.findByScheduleId(scheduleId);
+        List<ScheduleMember> scheduleLocations = scheduleMemberQueryRepository.findByScheduleId(
+            scheduleId);
 
         // 출발장소들을 이용하여 중간장소 계산
         Double middleLatitude = getLatitude(scheduleLocations);
@@ -291,7 +333,8 @@ public class ScheduleCommandService {
     private void saveMiddleLocation(List<JsonNode> subwayStation, Optional<Schedule> schedule) {
         Optional<Metro> metro;
         for (JsonNode subwayStationJson : subwayStation) {
-            SubwayStationDto subwayStationDto = SubwayStationDto.toDto(subwayStationJson, schedule.get());
+            SubwayStationDto subwayStationDto = SubwayStationDto.toDto(subwayStationJson,
+                schedule.get());
             Location location = SubwayStationDto.fromDto(subwayStationDto);
             location = locationCommandRepository.save(location);
 
@@ -301,7 +344,8 @@ public class ScheduleCommandService {
             List<Line> line = lineQueryRepository.findByMetroId(metro.get().getId());
 
             for (Line l : line) {
-                DepartLocationMetroTransferDto dto = DepartLocationMetroTransferDto.toDto(location, l);
+                DepartLocationMetroTransferDto dto = DepartLocationMetroTransferDto.toDto(location,
+                    l);
                 MetroTransfer metroTransfer = DepartLocationMetroTransferDto.fromDto(dto);
                 metroTransferCommandRepository.save(metroTransfer);
             }
@@ -334,8 +378,9 @@ public class ScheduleCommandService {
         return middleLatitude;
     }
 
-    private static void setDepartLocation(CreateDepartLocationRequest request, Optional<Metro> metro,
-                                          ScheduleMember scheduleMember) {
+    private static void setDepartLocation(CreateDepartLocationRequest request,
+        Optional<Metro> metro,
+        ScheduleMember scheduleMember) {
         // DB에 존재하지 않는다면
         if (metro.isEmpty()) {
             CreateDepartLocationDto dto = CreateDepartLocationDto.toDto(request);
@@ -415,26 +460,24 @@ public class ScheduleCommandService {
             .orElseThrow(() -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
 //        log.info("location = {}", location.toString());
 
-
         // 락 이후 voteCnt 증가시키기
         location.setVoteCount(location.getVoteCount() + 1);
 
         List<Location> locationList = locationQueryRepository.findByScheduleId(schedule.getId());
 //        log.info("locationList = {}", locationList.toString());
 
-        int scheduleMemberNumber = scheduleMemberQueryRepository.findByScheduleId(schedule.getId()).size();
+        int scheduleMemberNumber = scheduleMemberQueryRepository.findByScheduleId(schedule.getId())
+            .size();
 
         // vote 저장 시점을 뒤로 미뤄서, Location 락과의 교착을 방지
         VoteMiddleLocationDto dto = VoteMiddleLocationDto.toDto(scheduleMemberId, lid, schedule);
         Vote vote = VoteMiddleLocationDto.fromDto(dto, scheduleMemberRepository);
         voteCommandRepository.save(vote);
 
-
         int voteCount = voteQueryRepository.findByScheduleId(schedule.getId()).size();
         log.info("voteCount = {}", voteCount);
 
 //        Optional<Schedule> schedule1 = scheduleQueryRepository.findById(schedule.getId());
-
 
         if (scheduleMemberNumber - voteCount == 0) {
             Long winnerLocationId = 0L;
@@ -507,13 +550,15 @@ public class ScheduleCommandService {
 
     @Transactional
     public void WriteSuggestedLocation(Schedule schedule, WriteSuggestedLocationRequest request,
-                                       String userId) {
+        String userId) {
 
         List<Location> locationList = locationQueryRepository.findByScheduleId(schedule.getId());
         boolean bool = true;
 
         for (Location l : locationList) {
-            if (l.getVoteCount() != 0) bool = false;
+            if (l.getVoteCount() != 0) {
+                bool = false;
+            }
         }
 
         if (bool) {
@@ -529,7 +574,8 @@ public class ScheduleCommandService {
             List<Line> line = lineQueryRepository.findByMetroId(metro.get().getId());
 
             for (Line l : line) {
-                WriteSuggestedMetroTransferDto dto = WriteSuggestedMetroTransferDto.toDto(schedule, location, l);
+                WriteSuggestedMetroTransferDto dto = WriteSuggestedMetroTransferDto.toDto(schedule,
+                    location, l);
                 MetroTransfer metroTransfer = WriteSuggestedMetroTransferDto.fromDto(dto);
                 metroTransferCommandRepository.save(metroTransfer);
             }
@@ -540,11 +586,12 @@ public class ScheduleCommandService {
     }
 
     private Location saveSuggestedLocation(Schedule schedule, WriteSuggestedLocationRequest request,
-                                           Optional<Metro> metro, Member member) {
+        Optional<Metro> metro, Member member) {
         Location location;
         // DB에 존재하지 않는다면
         if (metro.isEmpty()) {
-            WriteSuggestedLocationDto dto = WriteSuggestedLocationDto.requestToDto(request, schedule, member);
+            WriteSuggestedLocationDto dto = WriteSuggestedLocationDto.requestToDto(request,
+                schedule, member);
 
             location = WriteSuggestedLocationDto.fromDto(dto);
             location = locationCommandRepository.save(location);

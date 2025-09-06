@@ -6,7 +6,7 @@ import com.grepp.spring.app.model.member.entity.Member;
 import com.grepp.spring.infra.entity.BaseEntity;
 import com.grepp.spring.infra.error.exceptions.group.NotGroupLeaderException;
 import com.grepp.spring.infra.error.exceptions.group.UserGroupLeaderException;
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -82,13 +82,13 @@ public class GroupMember extends BaseEntity {
 
     public void isGroupLeaderOrThrow() {
         if(!isGroupLeader()){
-            throw new NotGroupLeaderException(GroupErrorCode.NOT_GROUP_LEADER);
+            throw new NotGroupLeaderException(GroupAndMemberErrorCode.NOT_GROUP_LEADER);
         }
     }
 
     public void isNotGroupLeaderOrThrow(){
         if(isGroupLeader()){
-            throw new UserGroupLeaderException(GroupErrorCode.USER_GROUP_LEADER);
+            throw new UserGroupLeaderException(GroupAndMemberErrorCode.USER_GROUP_LEADER);
         }
     }
 

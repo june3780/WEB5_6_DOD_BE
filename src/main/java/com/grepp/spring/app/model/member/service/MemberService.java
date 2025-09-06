@@ -1,14 +1,14 @@
 package com.grepp.spring.app.model.member.service;
 
 import com.grepp.spring.app.controller.api.member.payload.MemberInfoResponse;
-import com.grepp.spring.app.model.auth.AuthService;
 import com.grepp.spring.app.controller.api.member.payload.ModifyMemberInfoResponse;
+import com.grepp.spring.app.model.auth.AuthService;
 import com.grepp.spring.app.model.group.service.GroupCommandService;
 import com.grepp.spring.app.model.member.entity.Member;
 import com.grepp.spring.app.model.member.repository.MemberRepository;
 import com.grepp.spring.app.model.schedule.service.ScheduleCommandService;
 import com.grepp.spring.infra.error.exceptions.mypage.MemberNotFoundException;
-import com.grepp.spring.infra.response.MyPageErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
@@ -36,7 +36,8 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberInfoResponse getMemberInfoResponse(String userId) {
         Member member = memberRepository.findById(userId)
-            .orElseThrow(() -> new MemberNotFoundException(MyPageErrorCode.MEMBER_NOT_FOUND)); // 서윤님이 만든 예외 쓰기. 나중에 전역 처리 해야함
+            .orElseThrow(() -> new MemberNotFoundException(
+                GroupAndMemberErrorCode.MEMBER_NOT_FOUND)); // 서윤님이 만든 예외 쓰기. 나중에 전역 처리 해야함
 
         return MemberInfoResponse.from(member);
     }
@@ -45,7 +46,8 @@ public class MemberService {
     @Transactional
     public ModifyMemberInfoResponse modifyMemberName(String userId, String username) {
         Member member = memberRepository.findById(userId)
-            .orElseThrow(() -> new MemberNotFoundException(MyPageErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(
+                () -> new MemberNotFoundException(GroupAndMemberErrorCode.MEMBER_NOT_FOUND));
 
         // 이제 Member 엔티티에서 자체적으로 이름 변경 및 검증 처리
         member.updateName(username);
@@ -53,28 +55,32 @@ public class MemberService {
         log.info("이름이 변경되었습니다. 이름: {}", member.getName());
 
         // 변경된 사용자 정보 리턴
-        return new ModifyMemberInfoResponse(member.getId(), member.getName(), member.getProfileImageNumber());
+        return new ModifyMemberInfoResponse(member.getId(), member.getName(),
+            member.getProfileImageNumber());
     }
 
     // 프로필 사진 변경
     @Transactional
     public ModifyMemberInfoResponse modifyProfileImage(String userId) {
         Member member = memberRepository.findById(userId)
-            .orElseThrow(() -> new MemberNotFoundException(MyPageErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(
+                () -> new MemberNotFoundException(GroupAndMemberErrorCode.MEMBER_NOT_FOUND));
 
         // Member 엔티티 자체에서 프로필 이미지 변경을 처리
         member.updateProfileImage();
         memberRepository.save(member);
         log.info("프로필 이미지가 변경되었습니다. 새로운 이미지 번호: {}", member.getProfileImageNumber());
 
-        return new ModifyMemberInfoResponse(member.getId(), member.getName(), member.getProfileImageNumber());
+        return new ModifyMemberInfoResponse(member.getId(), member.getName(),
+            member.getProfileImageNumber());
     }
 
     // 회원 탈퇴
     @Transactional
     public void withdraw(String userId, HttpServletResponse response, HttpServletRequest request) {
         Member member = memberRepository.findById(userId)
-            .orElseThrow(() -> new MemberNotFoundException(MyPageErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(
+                () -> new MemberNotFoundException(GroupAndMemberErrorCode.MEMBER_NOT_FOUND));
         // 1. 그룹 관련
         groupCommandService.handleGroupWithdrawal(member);
         // 2. 일정 관련

@@ -1,24 +1,17 @@
 package com.grepp.spring.infra.error.exceptions.group;
 
-import com.grepp.spring.infra.response.GroupErrorCode;
+import com.grepp.spring.infra.response.GroupAndMemberErrorCode;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
 public class UserAlreadyInGroupException extends RuntimeException {
 
-    private final GroupErrorCode code;
+    private final GroupAndMemberErrorCode code;
 
-    public UserAlreadyInGroupException(GroupErrorCode code) {
+    public UserAlreadyInGroupException(GroupAndMemberErrorCode code) {
         this.code = code;
-    }
-
-    public UserAlreadyInGroupException(GroupErrorCode code, Exception e) {
-        this.code = code;
-        log.error(e.getMessage(), e);
-    }
-
-    public GroupErrorCode code() {
-        return code;
     }
 
 }

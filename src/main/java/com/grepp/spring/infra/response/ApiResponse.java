@@ -50,23 +50,24 @@ public record ApiResponse<T>(
         return new ApiResponse<>(ResponseCode.ACTIVATED.code(), ResponseCode.ACTIVATED.message(), data);
     }
 
+    public static <T> ApiResponse<T> error(GroupAndMemberErrorCode code) {
+        return new ApiResponse<>(code.code(), code.message(), null);
+    }
+
+    public static <T> ApiResponse<T> error(GroupAndMemberErrorCode code, T data) {
+        return new ApiResponse<>(code.code(), code.message(), data);
+    }
+
     public static <T> ApiResponse<T> error(GroupErrorCode code) {
         return new ApiResponse<>(code.code(), code.message(), null);
     }
+
 
     public static <T> ApiResponse<T> error(EventErrorCode code) {
         return new ApiResponse<>(code.code(), code.message(), null);
     }
 
     public static <T> ApiResponse<T> error(EventErrorCode code, T data) {
-        return new ApiResponse<>(code.code(), code.message(), data);
-    }
-
-    public static <T> ApiResponse<T> error(MyPageErrorCode code) {
-        return new ApiResponse<>(code.code(), code.message(), null);
-    }
-
-    public static <T> ApiResponse<T> error(MyPageErrorCode code, T data) {
         return new ApiResponse<>(code.code(), code.message(), data);
     }
 
