@@ -292,7 +292,7 @@ public class GroupCommandService {
         }
         Group group = groupOptional.get();
         GroupDto groupDto = GroupMapper.INSTANCE.toDto(group);
-        log.info("groupDto", groupDto.toString());
+        log.info("groupDto: {}", groupDto.toString());
         return GroupMapper.INSTANCE.toDto(group);
     }
 
