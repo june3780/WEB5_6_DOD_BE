@@ -11,6 +11,8 @@ import com.grepp.spring.app.model.event.entity.Event;
 import com.grepp.spring.app.model.event.repository.EventMemberRepository;
 import com.grepp.spring.app.model.event.repository.EventRepository;
 import com.grepp.spring.app.model.group.code.GroupRole;
+import com.grepp.spring.app.model.group.dto.GroupDto;
+import com.grepp.spring.app.model.group.dto.mapper.GroupMapper;
 import com.grepp.spring.app.model.group.entity.Group;
 import com.grepp.spring.app.model.group.entity.GroupMember;
 import com.grepp.spring.app.model.group.repository.GroupCommandRepository;
@@ -105,7 +107,7 @@ public class GroupCommandService {
         // http 요청 사용자 조회 - 401 AUTHENTICATED_REQUIRED 예외 처리
         Member member = findHttpRequestMemberOrThrow();
         // 그룹 조회 - 404 GROUP_NOT_FOUND 예외 처리
-        Group group = findGroupOrThrow(groupId);
+        findGroupOrThrowDtoMapper(groupId);
         // 그룹멤버 조회 - 403 NOT_GROUP_MEMBER 예외 처리
         GroupMember groupMember = findGroupMemberOrThrow(groupId, member.getId());
         // 그룹멤버 리더 권한 조회 - 403 NOT_GROUP_LEADER 예외 처리
@@ -172,7 +174,7 @@ public class GroupCommandService {
         // http 요청 사용자 조회 - 401 AUTHENTICATED_REQUIRED 예외 처리
         Member member = findHttpRequestMemberOrThrow();
         // 그룹 조회 - 404 GROUP_NOT_FOUND 예외 처리
-        Group group = findGroupOrThrow(groupId);
+        findGroupOrThrowDtoMapper(groupId);
         // 멤버 조회 - 404 USER_NOT_FOUND 예외 처리 (권한 수정 대상)
         Member targetMember = findMemberOrThrow(request.getUserId());
         // 그룹멤버 조회 - 403 NOT_GROUP_MEMBER 예외 처리
@@ -279,6 +281,19 @@ public class GroupCommandService {
             throw new GroupNotFoundException(GroupAndMemberErrorCode.GROUP_NOT_FOUND);
         }
         return groupOptional.get();
+    }
+
+
+    // 그룹 조회 - 404 GROUP_NOT_FOUND 예외 처리
+    private GroupDto findGroupOrThrowDtoMapper(Long groupId) {
+        Optional<Group> groupOptional = groupCommandRepository.findById(groupId);
+        if (groupOptional.isEmpty()) {
+            throw new GroupNotFoundException(GroupAndMemberErrorCode.GROUP_NOT_FOUND);
+        }
+        Group group = groupOptional.get();
+        GroupDto groupDto = GroupMapper.INSTANCE.toDto(group);
+        log.info("groupDto", groupDto.toString());
+        return GroupMapper.INSTANCE.toDto(group);
     }
 
 
