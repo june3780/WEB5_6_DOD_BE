@@ -35,8 +35,8 @@ jobs:
         run: chmod +x gradlew
 
         # 테스트 실행 (테스트 코드 완성 시 주석 해제)
-        # - name: Run tests
-        #   run: ./gradlew test
+      - name: Run tests
+        run: ./gradlew test
 
       - name: Build with Gradle
         run: |

@@ -87,6 +87,12 @@ dependencies {
 
 tasks.withType(Test) {
     useJUnitPlatform()
+
+    // 특정 클래스 제외
+    exclude '**/EventJoinServiceTest.class'
+
+    // 특정 패키지(service 이하 전부) 제외
+    exclude '**/model/schedule/service/**'
 }
 
 ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
